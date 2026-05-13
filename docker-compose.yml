@@ -128,15 +128,16 @@ services:
     restart: unless-stopped
 
   # ---- Frontend (React + Vite) ----
+  # IMPORTANT: Change 'localhost' to your AWS Public IP before building!
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:4000
+        VITE_SOCKET_URL: http://localhost:4005
     container_name: smartbite-frontend
     ports:
       - "3000:3000"
-    environment:
-      - VITE_API_URL=http://localhost:4000
-      - VITE_SOCKET_URL=http://localhost:4005
-      # NOTE: For AWS, change 'localhost' to your Public IP above.
     depends_on:
       - api-gateway
     networks:
