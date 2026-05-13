@@ -1,0 +1,206 @@
+# ============================================================
+# Docker Compose — SmartBite Distributed System
+# ============================================================
+# This file orchestrates ALL services in the SmartBite platform.
+# Run with: docker-compose up --build
+#
+# Services:
+# - MongoDB (shared instance, separate databases)
+# - API Gateway (port 4000)
+# - User Service (port 4001)
+# - Restaurant Service (port 4002)
+# - Order Service (port 4003)
+# - Payment Service (port 4004)
+# - Delivery Service (port 4005)
+# - Frontend (port 3000)
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ---- MongoDB Database ----
+  # Single MongoDB instance with separate databases per service
+  # This demonstrates LOGICAL DATA SEPARATION
+  mongodb:
+    image: mongo:7
+    container_name: smartbite-mongodb
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- API Gateway ----
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: smartbite-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - JWT_SECRET=smartbite_super_secret_key_2024
+      - USER_SERVICE_URL=http://user-service:4001
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:4002
+      - ORDER_SERVICE_URL=http://order-service:4003
+      - PAYMENT_SERVICE_URL=http://payment-service:4004
+      - DELIVERY_SERVICE_URL=http://delivery-service:4005
+    depends_on:
+      - user-service
+      - restaurant-service
+      - order-service
+      - payment-service
+      - delivery-service
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- User Service ----
+  user-service:
+    build: ./services/user-service
+    container_name: smartbite-user
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - MONGO_URI=mongodb://mongodb:27017/smartbite_users
+      - JWT_SECRET=smartbite_super_secret_key_2024
+      - JWT_EXPIRES_IN=24h
+    depends_on:
+      - mongodb
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- Restaurant Service ----
+  restaurant-service:
+    build: ./services/restaurant-service
+    container_name: smartbite-restaurant
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+      - MONGO_URI=mongodb://mongodb:27017/smartbite_restaurants
+    depends_on:
+      - mongodb
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- Order Service ----
+  order-service:
+    build: ./services/order-service
+    container_name: smartbite-order
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+      - MONGO_URI=mongodb://mongodb:27017/smartbite_orders
+      - PAYMENT_SERVICE_URL=http://payment-service:4004
+      - DELIVERY_SERVICE_URL=http://delivery-service:4005
+      - USER_SERVICE_URL=http://user-service:4001
+    depends_on:
+      - mongodb
+      - payment-service
+      - delivery-service
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- Payment Service ----
+  payment-service:
+    build: ./services/payment-service
+    container_name: smartbite-payment
+    ports:
+      - "4004:4004"
+    environment:
+      - PORT=4004
+      - MONGO_URI=mongodb://mongodb:27017/smartbite_payments
+    depends_on:
+      - mongodb
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- Delivery Tracking Service ----
+  delivery-service:
+    build: ./services/delivery-service
+    container_name: smartbite-delivery
+    ports:
+      - "4005:4005"
+    environment:
+      - PORT=4005
+      - MONGO_URI=mongodb://mongodb:27017/smartbite_delivery
+      - ORDER_SERVICE_URL=http://order-service:4003
+    depends_on:
+      - mongodb
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  # ---- React Frontend ----
+  frontend:
+    build: ./frontend
+    container_name: smartbite-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:4000
+      - VITE_SOCKET_URL=http://localhost:4005
+      # NOTE: For AWS, change 'localhost' to your Public IP above.
+    depends_on:
+      - api-gateway
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  review-service:
+    build: ./services/review-service
+    container_name: smartbite-review-service
+    environment:
+      - PORT=4006
+      - MONGODB_URI=mongodb://mongodb:27017/smartbite_reviews
+      - ORDER_SERVICE_URL=http://order-service:4003
+      - JWT_SECRET=smartbite_super_secret_key_2024
+    depends_on:
+      - mongodb
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  analytics-service:
+    build: ./services/analytics-service
+    container_name: smartbite-analytics-service
+    environment:
+      - PORT=4007
+      - ORDER_SERVICE_URL=http://order-service:4003
+      - PAYMENT_SERVICE_URL=http://payment-service:4004
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:4002
+    depends_on:
+      - order-service
+      - payment-service
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+  chat-service:
+    build: ./services/chat-service
+    container_name: smartbite-chat-service
+    environment:
+      - PORT=4008
+    ports:
+      - "4008:4008"
+    networks:
+      - smartbite-network
+    restart: unless-stopped
+
+# ---- Shared Network ----
+# All services communicate over this Docker network
+networks:
+  smartbite-network:
+    driver: bridge
+
+# ---- Persistent Volume for MongoDB ----
+volumes:
+  mongodb_data:
