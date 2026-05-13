@@ -60,6 +60,8 @@ services:
       - PORT=4003
       - MONGO_URI=${MONGO_URI}
       - USER_SERVICE_URL=http://user-service:4001
+      - PAYMENT_SERVICE_URL=http://payment-service:4004
+      - DELIVERY_SERVICE_URL=http://delivery-service:4005
     networks:
       - smartbite-network
     restart: unless-stopped
