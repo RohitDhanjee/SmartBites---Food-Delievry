@@ -21,7 +21,7 @@ app.get('/health', (req, res) => {
 });
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 Review DB Connected'))
   .catch(err => console.error('❌ DB Error:', err));
 
