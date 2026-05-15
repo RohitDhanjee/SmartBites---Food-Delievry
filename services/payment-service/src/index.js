@@ -13,12 +13,14 @@
 // processed. This is suitable for an academic project.
 // ============================================================
 
+// IMPORTANT: dotenv MUST be loaded FIRST, before any module that reads process.env
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const paymentRoutes = require('./routes/paymentRoutes');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4004;

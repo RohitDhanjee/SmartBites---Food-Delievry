@@ -1,10 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const reviewRoutes = require('./routes/reviewRoutes');
-
-dotenv.config();
 
 const app = express();
 
@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 Review DB Connected'))
   .catch(err => console.error('❌ DB Error:', err));
 
-const PORT = process.env.PORT || 4006;
+const PORT = process.env.PORT || 4007;
 app.listen(PORT, () => {
   console.log(`⭐ Review Service running on port ${PORT}`);
 });

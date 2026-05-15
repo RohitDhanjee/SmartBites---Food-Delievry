@@ -112,7 +112,7 @@ app.use('/api/payments', authMiddleware, createProxyMiddleware(proxyOptions(proc
 app.use('/api/delivery', authMiddleware, createProxyMiddleware(proxyOptions(process.env.DELIVERY_SERVICE_URL, { '^/api/delivery': '' })));
 
 // --- Review Service (Protected) ---
-app.use('/api/reviews', authMiddleware, createProxyMiddleware(proxyOptions(process.env.REVIEW_SERVICE_URL || 'http://review-service:4006', { '^/api/reviews': '' })));
+app.use('/api/reviews', authMiddleware, createProxyMiddleware(proxyOptions(process.env.REVIEW_SERVICE_URL || 'http://review-service:4007', { '^/api/reviews': '' })));
 
 // --- Analytics Service (Admin Only) ---
 app.use('/api/analytics', authMiddleware, (req, res, next) => {
@@ -121,7 +121,7 @@ app.use('/api/analytics', authMiddleware, (req, res, next) => {
     return res.status(403).json({ success: false, message: 'Admin access required for analytics' });
   }
   next();
-}, createProxyMiddleware(proxyOptions(process.env.ANALYTICS_SERVICE_URL || 'http://analytics-service:4007', { '^/api/analytics': '' })));
+}, createProxyMiddleware(proxyOptions(process.env.ANALYTICS_SERVICE_URL || 'http://analytics-service:4006', { '^/api/analytics': '' })));
 
 
 // ---- 404 Handler ----

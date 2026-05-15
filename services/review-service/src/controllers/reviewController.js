@@ -1,7 +1,8 @@
 const Review = require('../models/Review');
 const axios = require('axios');
 
-const ORDER_SERVICE = process.env.ORDER_SERVICE_URL;
+// Helper to get Order Service URL with fallback
+const getOrderServiceURL = () => (process.env.ORDER_SERVICE_URL || 'http://order-service:4003').replace(/\/+$/, '');
 
 // ============================================================
 // POST /add — Submit a review
@@ -19,7 +20,9 @@ exports.addReview = async (req, res) => {
     // 1. Verify if the order exists and belongs to the user
     // This is INTER-SERVICE COMMUNICATION
     try {
-      const orderRes = await axios.get(`${ORDER_SERVICE}/${orderId}`);
+      const orderServiceUrl = `${getOrderServiceURL()}/${orderId}`;
+      console.log(`🔍 Review Service: Verifying order at ${orderServiceUrl}`);
+      const orderRes = await axios.get(orderServiceUrl);
       const order = orderRes.data.data;
 
       if (!order) {

@@ -17,7 +17,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'Analytics Service is healthy' });
 });
 
-const PORT = process.env.PORT || 4007;
+const PORT = process.env.PORT || 4006;
 app.listen(PORT, () => {
   console.log(`📊 Analytics Service running on port ${PORT}`);
 });

@@ -19,6 +19,9 @@
 // The HTTP server is "upgraded" to support WebSocket connections.
 // ============================================================
 
+// IMPORTANT: dotenv MUST be loaded FIRST, before any module that reads process.env
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -28,7 +31,6 @@ const connectDB = require('./config/db');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const { setupSocket } = require('./socket/trackingSocket');
 const deliveryController = require('./controllers/deliveryController');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4005;

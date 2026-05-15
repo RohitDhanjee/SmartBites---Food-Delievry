@@ -16,12 +16,16 @@
 // complete a business transaction.
 // ============================================================
 
+// IMPORTANT: dotenv MUST be loaded FIRST, before any module that reads process.env
+// Otherwise, PAYMENT_SERVICE_URL and DELIVERY_SERVICE_URL will be undefined
+// when orderController.js is first loaded.
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const orderRoutes = require('./routes/orderRoutes');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4003;

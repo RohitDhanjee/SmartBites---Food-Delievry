@@ -17,8 +17,11 @@
 const Order = require('../models/Order');
 const axios = require('axios');
 
-const PAYMENT_SERVICE = process.env.PAYMENT_SERVICE_URL;
-const DELIVERY_SERVICE = process.env.DELIVERY_SERVICE_URL;
+// Read service URLs at call-time using getters, not at module-load time.
+// This ensures environment variables are always available, even if dotenv
+// loads slightly after this module is first required.
+const getPaymentURL = () => (process.env.PAYMENT_SERVICE_URL || 'http://payment-service:4004').replace(/\/+$/, '');
+const getDeliveryURL = () => (process.env.DELIVERY_SERVICE_URL || 'http://delivery-service:4005').replace(/\/+$/, '');
 
 // ============================================================
 // POST /create — Create a new order
@@ -55,7 +58,9 @@ exports.createOrder = async (req, res) => {
     // This demonstrates INTER-SERVICE COMMUNICATION
     let paymentResult = null;
     try {
-      const paymentResponse = await axios.post(`${PAYMENT_SERVICE}/pay`, {
+      const paymentUrl = `${getPaymentURL()}/pay`;
+      console.log(`💳 Calling Payment Service at: ${paymentUrl}`);
+      const paymentResponse = await axios.post(paymentUrl, {
         orderId: order._id.toString(),
         userId,
         amount: totalAmount,
@@ -69,7 +74,8 @@ exports.createOrder = async (req, res) => {
         console.log(`💳 Payment processed: ${paymentResult.data._id}`);
       }
     } catch (payErr) {
-      console.log(`⚠️  Payment Service unavailable, continuing with order: ${payErr.message}`);
+      console.log(`⚠️  Payment Service error: ${payErr.message}`);
+      console.log(`   URL attempted: ${getPaymentURL()}/pay`);
       // Order continues even if payment service is down (fault tolerance)
     }
 
@@ -77,7 +83,9 @@ exports.createOrder = async (req, res) => {
     // Another INTER-SERVICE COMMUNICATION example
     let deliveryResult = null;
     try {
-      const deliveryResponse = await axios.post(`${DELIVERY_SERVICE}/assign`, {
+      const deliveryUrl = `${getDeliveryURL()}/assign`;
+      console.log(`🚴 Calling Delivery Service at: ${deliveryUrl}`);
+      const deliveryResponse = await axios.post(deliveryUrl, {
         orderId: order._id.toString(),
         deliveryAddress
       });
@@ -88,7 +96,8 @@ exports.createOrder = async (req, res) => {
         console.log(`🚴 Delivery assigned: ${deliveryResult.data._id}`);
       }
     } catch (delErr) {
-      console.log(`⚠️  Delivery Service unavailable, continuing with order: ${delErr.message}`);
+      console.log(`⚠️  Delivery Service error: ${delErr.message}`);
+      console.log(`   URL attempted: ${getDeliveryURL()}/assign`);
       // Order continues even if delivery service is down (fault tolerance)
     }
 

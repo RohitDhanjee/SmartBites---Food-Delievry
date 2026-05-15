@@ -35,7 +35,7 @@ services:
     container_name: smartbite-user
     environment:
       - PORT=4001
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_users
       - JWT_SECRET=smartbite_super_secret_key_2024
     networks:
       - smartbite-network
@@ -47,7 +47,7 @@ services:
     container_name: smartbite-restaurant
     environment:
       - PORT=4002
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_restaurants
     networks:
       - smartbite-network
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
     container_name: smartbite-order
     environment:
       - PORT=4003
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_orders
       - USER_SERVICE_URL=http://user-service:4001
       - PAYMENT_SERVICE_URL=http://payment-service:4004
       - DELIVERY_SERVICE_URL=http://delivery-service:4005
@@ -72,7 +72,7 @@ services:
     container_name: smartbite-payment
     environment:
       - PORT=4004
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_payments
     networks:
       - smartbite-network
     restart: unless-stopped
@@ -85,7 +85,7 @@ services:
       - "4005:4005"
     environment:
       - PORT=4005
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_delivery
       - ORDER_SERVICE_URL=http://order-service:4003
     networks:
       - smartbite-network
@@ -97,7 +97,7 @@ services:
     container_name: smartbite-analytics
     environment:
       - PORT=4006
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_analytics
       - ORDER_SERVICE_URL=http://order-service:4003
       - PAYMENT_SERVICE_URL=http://payment-service:4004
       - RESTAURANT_SERVICE_URL=http://restaurant-service:4002
@@ -111,7 +111,8 @@ services:
     container_name: smartbite-review
     environment:
       - PORT=4007
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_reviews
+      - ORDER_SERVICE_URL=http://order-service:4003
     networks:
       - smartbite-network
     restart: unless-stopped
@@ -124,7 +125,7 @@ services:
       - "4008:4008"
     environment:
       - PORT=4008
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017}/smartbite_chat
     networks:
       - smartbite-network
     restart: unless-stopped
@@ -135,8 +136,8 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:4000
-        VITE_SOCKET_URL: http://localhost:4005
+        VITE_API_URL: http://${PUBLIC_IP:-localhost}:4000
+        VITE_SOCKET_URL: http://${PUBLIC_IP:-localhost}:4005
     container_name: smartbite-frontend
     ports:
       - "3000:3000"
