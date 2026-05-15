@@ -6,9 +6,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import api from '../api/axios';
 
 const ManageMenu = () => {
   const { restaurantId } = useParams();
@@ -34,8 +34,8 @@ const ManageMenu = () => {
   const fetchData = async () => {
     try {
       const [resInfo, resMenu] = await Promise.all([
-        axios.get(`http://localhost:4000/api/restaurants/${restaurantId}`),
-        axios.get(`http://localhost:4000/api/restaurants/menu/${restaurantId}`)
+        api.get(`/api/restaurants/${restaurantId}`),
+        api.get(`/api/restaurants/menu/${restaurantId}`)
       ]);
 
       setRestaurant(resInfo.data.data);
@@ -51,13 +51,10 @@ const ManageMenu = () => {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('smartbite_token');
-      const response = await axios.post('http://localhost:4000/api/restaurants/menu/add', {
+      const response = await api.post('/api/restaurants/menu/add', {
         ...newItem,
         restaurantId,
         price: Number(newItem.price)
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.data.success) {
@@ -75,10 +72,7 @@ const ManageMenu = () => {
     if (!window.confirm('Delete this menu item?')) return;
 
     try {
-      const token = localStorage.getItem('smartbite_token');
-      const response = await axios.delete(`http://localhost:4000/api/restaurants/menu/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.delete(`/api/restaurants/menu/delete/${id}`);
 
       if (response.data.success) {
         toast.success('Item deleted');

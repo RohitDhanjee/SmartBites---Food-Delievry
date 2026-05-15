@@ -6,9 +6,9 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Save } from 'lucide-react';
+import api from '../api/axios';
 
 const AddEditRestaurant = () => {
   const { id } = useParams();
@@ -34,7 +34,7 @@ const AddEditRestaurant = () => {
 
   const fetchRestaurant = async () => {
     try {
-      const response = await axios.get(`http://localhost:4000/api/restaurants/${id}`);
+      const response = await api.get(`/api/restaurants/${id}`);
       if (response.data.success) {
         setFormData(response.data.data);
       }
@@ -54,16 +54,13 @@ const AddEditRestaurant = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('smartbite_token');
       const url = isEdit 
-        ? `http://localhost:4000/api/restaurants/update/${id}`
-        : 'http://localhost:4000/api/restaurants/add';
+        ? `/api/restaurants/update/${id}`
+        : '/api/restaurants/add';
       
       const method = isEdit ? 'put' : 'post';
 
-      const response = await axios[method](url, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api[method](url, formData);
 
       if (response.data.success) {
         toast.success(isEdit ? 'Restaurant updated' : 'Restaurant added');

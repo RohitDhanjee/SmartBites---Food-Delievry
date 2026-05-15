@@ -7,9 +7,9 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Plus, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import api from '../api/axios';
 
 const AdminDashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -21,7 +21,7 @@ const AdminDashboard = () => {
 
   const fetchRestaurants = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/restaurants');
+      const response = await api.get('/api/restaurants');
       if (response.data.success) {
         setRestaurants(response.data.data);
       }
@@ -36,10 +36,7 @@ const AdminDashboard = () => {
     if (!window.confirm('Are you sure you want to delete this restaurant and all its menu items?')) return;
 
     try {
-      const token = localStorage.getItem('smartbite_token');
-      const response = await axios.delete(`http://localhost:4000/api/restaurants/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.delete(`/api/restaurants/delete/${id}`);
 
       if (response.data.success) {
         toast.success('Restaurant deleted');
