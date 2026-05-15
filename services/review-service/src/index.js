@@ -21,7 +21,18 @@ app.get('/health', (req, res) => {
 });
 
 // Database connection
-mongoose.connect(process.env.MONGO_URI)
+let mongoUri = process.env.MONGO_URI;
+const dbName = 'smartbite_reviews';
+if (mongoUri && !mongoUri.includes(dbName)) {
+  if (mongoUri.includes('?')) {
+    const [base, query] = mongoUri.split('?');
+    mongoUri = `${base.replace(/\/$/, '')}/${dbName}?${query}`;
+  } else {
+    mongoUri = `${mongoUri.replace(/\/$/, '')}/${dbName}`;
+  }
+}
+
+mongoose.connect(mongoUri || `mongodb://localhost:27017/${dbName}`)
   .then(() => console.log('📦 Review DB Connected'))
   .catch(err => console.error('❌ DB Error:', err));
 
