@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { Package, Eye, Clock, Star } from 'lucide-react';
+import { OrderSkeleton } from '../components/Skeleton';
 
 const statusColors = {
   placed: '#3b82f6', confirmed: '#8b5cf6', preparing: '#f59e0b',
@@ -24,7 +25,16 @@ const Orders = () => {
     finally { setLoading(false); }
   };
 
-  if (loading) return <div className="loading-container"><div className="spinner"></div><p>Loading orders...</p></div>;
+  if (loading) return (
+    <div className="page">
+      <div className="container" style={{maxWidth:800}}>
+        <div className="page-header"><h1>My Orders</h1><p>Loading...</p></div>
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          {[1, 2, 3].map(i => <OrderSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="page"><div className="container" style={{maxWidth:800}}>
@@ -39,8 +49,8 @@ const Orders = () => {
             <div key={order._id} className="glass-card animate-fadeIn" style={{padding:'20px 24px',animationDelay:`${i*0.05}s`}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
                 <div>
-                  <h3 style={{fontSize:17,fontWeight:700,color:'#f1f5f9',marginBottom:4}}>{order.restaurantName}</h3>
-                  <p style={{fontSize:12,color:'#64748b',display:'flex',alignItems:'center',gap:4}}>
+                  <h3 style={{fontSize:17,fontWeight:700,color:'var(--text-primary)',marginBottom:4}}>{order.restaurantName}</h3>
+                  <p style={{fontSize:12,color:'var(--text-muted)',display:'flex',alignItems:'center',gap:4}}>
                     <Clock size={12} /> {new Date(order.createdAt).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}
                   </p>
                 </div>
@@ -49,7 +59,7 @@ const Orders = () => {
                   {order.status}
                 </span>
               </div>
-              <div style={{fontSize:13,color:'#94a3b8',marginBottom:12}}>
+              <div style={{fontSize:13,color:'var(--text-secondary)',marginBottom:12}}>
                 {order.items?.map(i => `${i.name} x${i.quantity}`).join(' • ')}
               </div>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>

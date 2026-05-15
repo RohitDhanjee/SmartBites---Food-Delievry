@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import MenuItemCard from '../components/MenuItemCard';
-import { ArrowLeft, Star, Clock, MapPin, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Star, Clock, MapPin, Brain } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { MenuSkeleton } from '../components/Skeleton';
 
 const RestaurantMenu = () => {
   const { id } = useParams();
@@ -43,28 +44,37 @@ const RestaurantMenu = () => {
   const categories = ['all', ...new Set(menuItems.map(i => i.category))];
   const filteredItems = activeCategory === 'all' ? menuItems : menuItems.filter(i => i.category === activeCategory);
 
-  if (loading) return <div className="loading-container"><div className="spinner"></div><p>Loading menu...</p></div>;
+  if (loading) return (
+    <div className="page">
+      <div className="container">
+        <div style={{ height: 300, background: 'var(--bg-glass)', borderRadius: 16, marginBottom: 32 }} className="skeleton"></div>
+        <div className="grid-menu">
+          {[1, 2, 3, 4, 5, 6].map(i => <MenuSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
   if (!restaurant) return <div className="empty-state"><div className="emoji">😕</div><h3>Restaurant not found</h3><Link to="/" className="btn btn-primary" style={{marginTop:16}}>Go Home</Link></div>;
 
   return (
     <div className="page">
       <div className="container">
-        <Link to="/" style={{display:'inline-flex',alignItems:'center',gap:8,color:'#94a3b8',fontSize:14,marginBottom:20,textDecoration:'none'}}>
+        <Link to="/" style={{display:'inline-flex',alignItems:'center',gap:8,color:'var(--text-muted)',fontSize:14,marginBottom:20,textDecoration:'none'}}>
           <ArrowLeft size={18} /> Back to Restaurants
         </Link>
-        <div style={{borderRadius:16,overflow:'hidden',marginBottom:32,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}} className="animate-slideUp">
+        <div style={{borderRadius:16,overflow:'hidden',marginBottom:32,background:'var(--bg-card)',border:'1px solid var(--border-glass)'}} className="animate-slideUp">
           <div style={{position:'relative',height:220}}>
             <img src={restaurant.image} alt={restaurant.name} style={{width:'100%',height:'100%',objectFit:'cover'}}
               onError={e=>{e.target.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';}} />
             <div style={{position:'absolute',bottom:0,left:0,right:0,height:'70%',background:'linear-gradient(to top, rgba(10,10,15,0.95), transparent)'}}></div>
           </div>
           <div style={{padding:'20px 24px 24px',marginTop:-60,position:'relative',zIndex:1}}>
-            <h1 style={{fontSize:28,fontWeight:800,color:'#f1f5f9',marginBottom:4}}>{restaurant.name}</h1>
+            <h1 style={{fontSize:28,fontWeight:800,color:'var(--text-primary)',marginBottom:4}}>{restaurant.name}</h1>
             <p style={{fontSize:14,color:'#ff8c42',fontWeight:500,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>{restaurant.cuisine}</p>
             <div style={{display:'flex',flexWrap:'wrap',gap:20}}>
-              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'#cbd5e1'}}><Star size={16} fill="#f59e0b" color="#f59e0b" />{restaurant.rating?.toFixed(1)}</span>
-              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'#cbd5e1'}}><Clock size={16} />{restaurant.deliveryTime}</span>
-              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'#cbd5e1'}}><MapPin size={16} />{restaurant.address}</span>
+              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'var(--text-secondary)'}}><Star size={16} fill="#f59e0b" color="#f59e0b" />{restaurant.rating?.toFixed(1)}</span>
+              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'var(--text-secondary)'}}><Clock size={16} />{restaurant.deliveryTime}</span>
+              <span style={{display:'flex',alignItems:'center',gap:6,fontSize:14,color:'var(--text-secondary)'}}><MapPin size={16} />{restaurant.address}</span>
             </div>
           </div>
         </div>
@@ -72,7 +82,7 @@ const RestaurantMenu = () => {
           {categories.map(cat => (
             <button key={cat} onClick={()=>setActiveCategory(cat)} style={{
               padding:'8px 18px',borderRadius:999,fontSize:13,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',fontFamily:'Inter,sans-serif',transition:'all 0.2s',
-              ...(activeCategory===cat ? {background:'linear-gradient(135deg,#ff6b35,#ff8c42)',color:'white',border:'1px solid transparent'} : {border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.04)',color:'#94a3b8'})
+              ...(activeCategory===cat ? {background:'linear-gradient(135deg,#ff6b35,#ff8c42)',color:'white',border:'1px solid transparent'} : {border:'1px solid var(--border-glass)',background:'var(--bg-glass)',color:'var(--text-secondary)'})
             }}>{cat.charAt(0).toUpperCase()+cat.slice(1)}</button>
           ))}
         </div>
@@ -81,12 +91,12 @@ const RestaurantMenu = () => {
 
         {/* Reviews Section */}
         <div style={{marginTop: 60, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 40}}>
-          <h2 style={{fontSize: 24, fontWeight: 800, color: '#f1f5f9', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12}}>
-            ⭐ Customer Reviews <span style={{fontSize: 14, color: '#64748b', fontWeight: 500}}>({reviews.length})</span>
+          <h2 style={{fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12}}>
+            ⭐ Customer Reviews <span style={{fontSize: 14, color: 'var(--text-muted)', fontWeight: 500}}>({reviews.length})</span>
           </h2>
           
           {reviews.length === 0 ? (
-            <div style={{padding: '40px 0', textAlign: 'center', color: '#94a3b8', background: 'rgba(255,255,255,0.02)', borderRadius: 12}}>
+            <div style={{padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-glass)', borderRadius: 12}}>
               No reviews yet for this restaurant.
             </div>
           ) : (
@@ -98,7 +108,7 @@ const RestaurantMenu = () => {
                       <div style={{width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#ff6b35,#ff8c42)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'white'}}>
                         {review.userName.charAt(0).toUpperCase()}
                       </div>
-                      <span style={{fontWeight: 600, color: '#f1f5f9'}}>{review.userName}</span>
+                      <span style={{fontWeight: 600, color: 'var(--text-primary)'}}>{review.userName}</span>
                     </div>
                     <div style={{display: 'flex', gap: 2}}>
                       {[...Array(5)].map((_, i) => (
@@ -106,14 +116,19 @@ const RestaurantMenu = () => {
                       ))}
                     </div>
                   </div>
-                  <p style={{fontSize: 14, color: '#94a3b8', lineHeight: 1.5}}>{review.comment}</p>
+                  <p style={{fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 12}}>{review.comment}</p>
+                  <div style={{display:'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'rgba(255,140,66,0.1)', border: '1px solid rgba(255,140,66,0.2)', borderRadius: 6, alignSelf: 'flex-start', width: 'fit-content'}}>
+                    <Brain size={12} color="#ff8c42" />
+                    <span style={{fontSize: 10, color: '#ff8c42', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5}}>
+                      AI Sentiment: {review.sentiment || 'Neutral'}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {cartCount > 0 && <Link to="/cart" className="btn btn-primary" style={{position:'fixed',bottom:24,right:24,zIndex:50,padding:'14px 28px',fontSize:15,borderRadius:999,textDecoration:'none',boxShadow:'0 8px 30px rgba(255,107,53,0.4)'}}><ShoppingCart size={20} />View Cart ({cartCount})</Link>}
       </div>
     </div>
   );

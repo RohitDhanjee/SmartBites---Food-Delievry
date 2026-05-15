@@ -5,6 +5,7 @@ const adminMiddleware = require('../middleware/admin');
 
 // --- Public Routes ---
 router.get('/', restaurantController.getAllRestaurants);
+router.get('/recommendations', restaurantController.getRecommendations);
 router.get('/:id', restaurantController.getRestaurant);
 router.get('/menu/:restaurantId', restaurantController.getMenu);
 

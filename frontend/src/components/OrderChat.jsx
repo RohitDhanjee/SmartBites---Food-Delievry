@@ -122,8 +122,8 @@ const OrderChat = ({ orderId }) => {
       <style dangerouslySetInnerHTML={{ __html: `
         .order-chat-container {
           position: fixed;
-          bottom: 24px;
-          right: 24px;
+          bottom: 30px;
+          left: 30px;
           z-index: 1000;
         }
         .chat-toggle {
@@ -160,19 +160,19 @@ const OrderChat = ({ orderId }) => {
         .chat-window {
           width: 350px;
           height: 480px;
-          background: #11111a;
-          border: 1px solid rgba(255,255,255,0.1);
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-glass);
           border-radius: 20px;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          box-shadow: var(--shadow-lg);
           overflow: hidden;
           backdrop-filter: blur(20px);
         }
         .chat-header {
           padding: 16px;
-          background: rgba(255,255,255,0.03);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--bg-glass);
+          border-bottom: 1px solid var(--border-glass);
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -188,11 +188,11 @@ const OrderChat = ({ orderId }) => {
           justify-content: center;
           color: white;
         }
-        .header-info h4 { font-size: 14px; font-weight: 700; margin: 0; color: #f1f5f9; }
+        .header-info h4 { font-size: 14px; font-weight: 700; margin: 0; color: var(--text-primary); }
         .online-status { font-size: 11px; color: #22c55e; margin: 0; display: flex; align-items: center; gap: 4px; }
         .online-status::before { content: ''; width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; }
-        .close-btn { background: none; border: none; color: #64748b; cursor: pointer; }
-
+        .close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+ 
         .chat-messages {
           flex: 1;
           padding: 16px;
@@ -204,7 +204,7 @@ const OrderChat = ({ orderId }) => {
         .system-msg {
           text-align: center;
           font-size: 11px;
-          color: #64748b;
+          color: var(--text-muted);
           margin-bottom: 8px;
           display: flex;
           align-items: center;
@@ -227,26 +227,27 @@ const OrderChat = ({ orderId }) => {
         }
         .message-bubble.received {
           align-self: flex-start;
-          background: rgba(255,255,255,0.08);
-          color: #e2e8f0;
+          background: var(--bg-glass);
+          color: var(--text-primary);
+          border: 1px solid var(--border-glass);
           border-bottom-left-radius: 4px;
         }
         .msg-time { font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
-
+ 
         .chat-input {
           padding: 16px;
-          background: rgba(255,255,255,0.03);
-          border-top: 1px solid rgba(255,255,255,0.06);
+          background: var(--bg-glass);
+          border-top: 1px solid var(--border-glass);
           display: flex;
           gap: 10px;
         }
         .chat-input input {
           flex: 1;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
+          background: var(--bg-primary);
+          border: 1px solid var(--border-glass);
           border-radius: 12px;
           padding: 10px 14px;
-          color: white;
+          color: var(--text-primary);
           font-size: 14px;
           outline: none;
         }

@@ -28,6 +28,11 @@ const ReviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  sentiment: {
+    type: String,
+    enum: ['Positive', 'Negative', 'Neutral'],
+    default: 'Neutral'
+  },
   createdAt: {
     type: Date,
     default: Date.now

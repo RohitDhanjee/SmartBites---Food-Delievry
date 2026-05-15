@@ -7,36 +7,68 @@ import api from '../api/axios';
 import RestaurantCard from '../components/RestaurantCard';
 import { Search, Flame, TrendingUp } from 'lucide-react';
 
+import { motion } from 'framer-motion';
+import { RestaurantSkeleton } from '../components/Skeleton';
+
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    fetchRestaurants();
+    fetchData();
   }, []);
 
-  const fetchRestaurants = async () => {
+  const fetchData = async () => {
     try {
-      const response = await api.get('/api/restaurants');
-      setRestaurants(response.data.data || []);
+      const [resAll, resRec] = await Promise.all([
+        api.get('/api/restaurants'),
+        api.get('/api/restaurants/recommendations')
+      ]);
+      setRestaurants(resAll.data.data || []);
+      setRecommended(resRec.data.data || []);
     } catch (error) {
-      console.error('Failed to fetch restaurants:', error);
+      console.error('Failed to fetch data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = restaurants.filter(r =>
-    r.name.toLowerCase().includes(search.toLowerCase()) ||
-    r.cuisine.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = restaurants.filter(r => {
+    const q = search.toLowerCase();
+    if (!q) return true;
+    
+    const name = r.name.toLowerCase();
+    const cuisine = r.cuisine.toLowerCase();
+    
+    // Exact or partial match
+    if (name.includes(q) || cuisine.includes(q)) return true;
+
+    // Fuzzy match: checks if all characters of query appear in target in sequence
+    // Example: "brgr" will match "Burger"
+    const fuzzy = (target, query) => {
+      let i = 0, j = 0;
+      while (i < target.length && j < query.length) {
+        if (target[i] === query[j]) j++;
+        i++;
+      }
+      return j === query.length;
+    };
+
+    return fuzzy(name, q) || fuzzy(cuisine, q);
+  });
 
   return (
     <div className="page">
       <div className="container">
         {/* Hero Section */}
-        <div style={styles.hero} className="animate-slideUp">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          style={styles.hero}
+        >
           <div style={styles.heroTag}>
             <Flame size={14} color="#ff6b35" />
             <span>AI-Powered Food Delivery</span>
@@ -61,12 +93,44 @@ const Home = () => {
               id="search-restaurants"
             />
           </div>
-        </div>
+        </motion.div>
+
+        {/* AI Recommendations Section */}
+        {!loading && recommended.length > 0 && !search && (
+          <div style={{ marginBottom: '48px' }}>
+            <div style={styles.sectionHeader}>
+              <h2 style={styles.sectionTitle}>✨ Recommended by AI</h2>
+              <span style={{ fontSize: '12px', color: '#ff8c42', fontWeight: 600 }}>BASED ON YOUR PREFERENCES</span>
+            </div>
+            <div className="grid-restaurants">
+              {recommended.map((restaurant, index) => (
+                <motion.div 
+                  key={`rec-${restaurant._id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  style={{ position: 'relative' }}
+                >
+                  <div style={styles.aiBadge}>
+                    <TrendingUp size={12} /> {restaurant.aiMatchScore}% Match
+                  </div>
+                  <RestaurantCard restaurant={restaurant} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats Bar */}
-        <div style={styles.stats} className="animate-fadeIn">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          style={styles.stats}
+        >
           <div style={styles.stat}>
-            <span style={styles.statNumber}>{restaurants.length}</span>
+            <span style={styles.statNumber}>{loading ? '...' : restaurants.length}</span>
             <span style={styles.statLabel}>Restaurants</span>
           </div>
           <div style={styles.statDivider}></div>
@@ -79,25 +143,32 @@ const Home = () => {
             <TrendingUp size={16} color="#22c55e" />
             <span style={styles.statLabel}>Real-time Tracking</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Restaurant Grid */}
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>🍽️ Popular Restaurants</h2>
-          <span style={styles.count}>{filtered.length} found</span>
+          <h2 style={styles.sectionTitle}>🍽️ All Restaurants</h2>
+          {!loading && <span style={styles.count}>{filtered.length} found</span>}
         </div>
 
         {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading restaurants...</p>
+          <div className="grid-restaurants">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <RestaurantSkeleton key={i} />
+            ))}
           </div>
         ) : filtered.length > 0 ? (
           <div className="grid-restaurants">
             {filtered.map((restaurant, index) => (
-              <div key={restaurant._id} style={{ animationDelay: `${index * 0.1}s` }}>
+              <motion.div 
+                key={restaurant._id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
                 <RestaurantCard restaurant={restaurant} />
-              </div>
+              </motion.div>
             ))}
           </div>
         ) : (
@@ -135,7 +206,7 @@ const styles = {
     fontWeight: 900,
     lineHeight: 1.1,
     marginBottom: '16px',
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     letterSpacing: '-1px',
   },
   heroAccent: {
@@ -145,7 +216,7 @@ const styles = {
   },
   heroSubtitle: {
     fontSize: '17px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     maxWidth: '500px',
     margin: '0 auto 32px',
     lineHeight: 1.6,
@@ -157,8 +228,8 @@ const styles = {
     maxWidth: '500px',
     margin: '0 auto',
     padding: '14px 20px',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-glass)',
     borderRadius: '14px',
     transition: 'all 0.3s',
   },
@@ -166,7 +237,7 @@ const styles = {
     flex: 1,
     background: 'none',
     border: 'none',
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     fontSize: '15px',
     outline: 'none',
     fontFamily: 'Inter, sans-serif',
@@ -178,9 +249,9 @@ const styles = {
     gap: '32px',
     padding: '20px',
     margin: '0 0 40px',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--bg-card)',
     borderRadius: '14px',
-    border: '1px solid rgba(255,255,255,0.06)',
+    border: '1px solid var(--border-glass)',
   },
   stat: {
     display: 'flex',
@@ -194,13 +265,13 @@ const styles = {
   },
   statLabel: {
     fontSize: '13px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     fontWeight: 500,
   },
   statDivider: {
     width: '1px',
     height: '24px',
-    background: 'rgba(255,255,255,0.1)',
+    background: 'var(--border-glass)',
   },
   sectionHeader: {
     display: 'flex',
@@ -211,13 +282,30 @@ const styles = {
   sectionTitle: {
     fontSize: '22px',
     fontWeight: 700,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
   },
   count: {
     fontSize: '13px',
-    color: '#64748b',
+    color: 'var(--text-muted)',
     fontWeight: 500,
   },
+  aiBadge: {
+    position: 'absolute',
+    top: '12px',
+    left: '12px',
+    zIndex: 10,
+    background: 'rgba(15, 23, 42, 0.8)',
+    backdropFilter: 'blur(4px)',
+    color: '#ff8c42',
+    padding: '4px 10px',
+    borderRadius: '8px',
+    fontSize: '11px',
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    border: '1px solid rgba(255, 140, 66, 0.3)',
+  }
 };
 
 export default Home;

@@ -251,4 +251,38 @@ exports.deleteMenuItem = async (req, res) => {
     });
   }
 };
+// ============================================================
+// GET /recommendations — AI-Powered recommendations
+// ============================================================
+exports.getRecommendations = async (req, res) => {
+  try {
+    // Simple AI-powered recommendation logic (Weighted Scoring)
+    const all = await Restaurant.find({ isOpen: true });
+    
+    const recommended = all.map(r => {
+      const ratingWeight = r.rating * 10; // scale to 0-50
+      const timeValue = parseInt(r.deliveryTime) || 30;
+      const timeWeight = (60 - timeValue) / 2; // faster is better, scale to ~0-15
+      
+      // Calculate AI Match Score (0-100)
+      const aiMatchScore = Math.min(99, Math.round(ratingWeight + timeWeight + (Math.random() * 5)));
+      
+      return {
+        ...r._doc,
+        aiMatchScore
+      };
+    }).sort((a, b) => b.aiMatchScore - a.aiMatchScore).slice(0, 4);
 
+    res.json({
+      success: true,
+      count: recommended.length,
+      data: recommended
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'AI failed to compute recommendations',
+      error: error.message
+    });
+  }
+};

@@ -33,7 +33,7 @@ const OrderTracker = ({ status, deliveryInfo }) => {
                 ...styles.line,
                 background: isCompleted 
                   ? 'linear-gradient(to right, #ff6b35, #ff8c42)' 
-                  : 'rgba(255,255,255,0.08)',
+                  : 'var(--border-glass)',
               }}></div>
             )}
             
@@ -42,7 +42,7 @@ const OrderTracker = ({ status, deliveryInfo }) => {
               ...styles.circle,
               background: isCompleted 
                 ? `linear-gradient(135deg, ${step.color}, ${step.color}dd)`
-                : 'rgba(255,255,255,0.06)',
+                : 'var(--bg-glass)',
               border: isCurrent ? `2px solid ${step.color}` : '2px solid transparent',
               boxShadow: isCurrent ? `0 0 20px ${step.color}40` : 'none',
               transform: isCurrent ? 'scale(1.15)' : 'scale(1)',
@@ -53,7 +53,7 @@ const OrderTracker = ({ status, deliveryInfo }) => {
             {/* Step Label */}
             <span style={{
               ...styles.label,
-              color: isCompleted ? '#f1f5f9' : '#64748b',
+              color: isCompleted ? 'var(--text-primary)' : 'var(--text-secondary)',
               fontWeight: isCurrent ? 600 : 400,
             }}>
               {step.label}
@@ -146,11 +146,11 @@ const styles = {
   riderName: {
     fontSize: '14px',
     fontWeight: 600,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
   },
   riderPhone: {
     fontSize: '12px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
   },
   eta: {
     display: 'flex',
@@ -164,7 +164,7 @@ const styles = {
   },
   etaLabel: {
     fontSize: '11px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     textTransform: 'uppercase',
   },
 };

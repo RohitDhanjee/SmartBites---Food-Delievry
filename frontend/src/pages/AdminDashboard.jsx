@@ -8,15 +8,18 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Plus, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Edit2, Trash2, ExternalLink, RefreshCcw } from 'lucide-react';
 import api from '../api/axios';
 
 const AdminDashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [systemHealth, setSystemHealth] = useState([]);
+  const [healthLoading, setHealthLoading] = useState(true);
 
   useEffect(() => {
     fetchRestaurants();
+    fetchSystemHealth();
   }, []);
 
   const fetchRestaurants = async () => {
@@ -29,6 +32,17 @@ const AdminDashboard = () => {
       toast.error('Failed to fetch restaurants');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSystemHealth = async () => {
+    try {
+      const response = await api.get('/api/system/health');
+      setSystemHealth(response.data.cluster || []);
+    } catch (error) {
+      console.error('Health check failed');
+    } finally {
+      setHealthLoading(false);
     }
   };
 
@@ -62,14 +76,55 @@ const AdminDashboard = () => {
           </Link>
         </div>
 
+        {/* System Health Section (The "WOW" Feature) */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Distributed Nodes & Health
+            </h2>
+            <button 
+              onClick={() => { setHealthLoading(true); fetchSystemHealth(); }} 
+              className="btn-icon" 
+              title="Refresh Health"
+              disabled={healthLoading}
+              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+            >
+              <RefreshCcw size={14} className={healthLoading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+          <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))' }}>
+            <div className="glass-card stat-card" style={{ borderLeft: '4px solid var(--success)' }}>
+              <span className="stat-label">API Gateway</span>
+              <span className="stat-value" style={{ fontSize: '16px', color: 'var(--success)' }}>● Online</span>
+            </div>
+            {healthLoading ? (
+              [1, 2, 3].map(i => <div key={i} className="glass-card stat-card skeleton" style={{ height: '80px' }}></div>)
+            ) : (
+              systemHealth.map((node, index) => (
+                <div key={index} className="glass-card stat-card" style={{
+                  borderLeft: `4px solid ${node.status === 'Online' ? 'var(--success)' : 'var(--danger)'}`
+                }}>
+                  <span className="stat-label">{node.name}</span>
+                  <span className="stat-value" style={{
+                    fontSize: '16px',
+                    color: node.status === 'Online' ? 'var(--success)' : 'var(--danger)'
+                  }}>
+                    {node.status === 'Online' ? '● Online' : '○ Offline'}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         <div className="admin-stats-grid">
           <div className="glass-card stat-card">
             <span className="stat-label">Total Restaurants</span>
             <span className="stat-value">{restaurants.length}</span>
           </div>
           <div className="glass-card stat-card">
-            <span className="stat-label">System Status</span>
-            <span className="stat-value status-active">Active</span>
+            <span className="stat-label">Cluster Status</span>
+            <span className="stat-value status-active">Operational</span>
           </div>
         </div>
 
@@ -109,9 +164,9 @@ const AdminDashboard = () => {
                       <Link to={`/admin/restaurant/edit/${restaurant._id}`} className="btn-icon" title="Edit Info">
                         <Edit2 size={16} />
                       </Link>
-                      <button 
-                        onClick={() => handleDelete(restaurant._id)} 
-                        className="btn-icon delete" 
+                      <button
+                        onClick={() => handleDelete(restaurant._id)}
+                        className="btn-icon delete"
                         title="Remove Restaurant"
                       >
                         <Trash2 size={16} />
@@ -125,7 +180,8 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .admin-header {
           display: flex;
           justify-content: space-between;

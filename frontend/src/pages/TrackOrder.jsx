@@ -55,7 +55,7 @@ const TrackOrder = () => {
 
   return (
     <div className="page"><div className="container" style={{maxWidth:600}}>
-      <Link to="/orders" style={{display:'inline-flex',alignItems:'center',gap:8,color:'#94a3b8',fontSize:14,marginBottom:20,textDecoration:'none'}}>
+      <Link to="/orders" style={{display:'inline-flex',alignItems:'center',gap:8,color:'var(--text-muted)',fontSize:14,marginBottom:20,textDecoration:'none'}}>
         <ArrowLeft size={18} /> Back to Orders
       </Link>
       <div className="glass-card" style={{padding:32,textAlign:'center'}}>
@@ -63,32 +63,32 @@ const TrackOrder = () => {
           {connected ? <><Wifi size={16} color="#22c55e" /><span style={{fontSize:13,color:'#22c55e',fontWeight:500}}>Live Tracking</span></>
             : <><WifiOff size={16} color="#ef4444" /><span style={{fontSize:13,color:'#ef4444',fontWeight:500}}>Connecting...</span></>}
         </div>
-        <h2 style={{fontSize:22,fontWeight:700,color:'#f1f5f9',marginBottom:4}}>Order #{orderId.slice(-6).toUpperCase()}</h2>
-        <p style={{fontSize:14,color:'#94a3b8',marginBottom:8}}>{order.restaurantName}</p>
+        <h2 style={{fontSize:22,fontWeight:700,color:'var(--text-primary)',marginBottom:4}}>Order #{orderId.slice(-6).toUpperCase()}</h2>
+        <p style={{fontSize:14,color:'var(--text-secondary)',marginBottom:8}}>{order.restaurantName}</p>
         <p style={{fontSize:20,fontWeight:800,color:'#ff6b35',marginBottom:24}}>Rs. {order.totalAmount}</p>
 
         <OrderTracker status={order.status} deliveryInfo={delivery} />
 
         {messages.length > 0 && (
           <div style={{marginTop:24,textAlign:'left'}}>
-            <h4 style={{fontSize:14,fontWeight:600,color:'#94a3b8',marginBottom:12,textTransform:'uppercase',letterSpacing:0.5}}>Live Updates</h4>
+            <h4 style={{fontSize:14,fontWeight:600,color:'var(--text-secondary)',marginBottom:12,textTransform:'uppercase',letterSpacing:0.5}}>Live Updates</h4>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {messages.map((msg, i) => (
-                <div key={i} style={{padding:'10px 14px',background:'rgba(255,255,255,0.04)',borderRadius:10,borderLeft:'3px solid #ff6b35'}}>
-                  <p style={{fontSize:14,color:'#f1f5f9'}}>{msg.text}</p>
-                  <p style={{fontSize:11,color:'#64748b',marginTop:2}}>{msg.time}</p>
+                <div key={i} style={{padding:'10px 14px',background:'var(--bg-glass)',borderRadius:10,borderLeft:'3px solid #ff6b35'}}>
+                  <p style={{fontSize:14,color:'var(--text-primary)'}}>{msg.text}</p>
+                  <p style={{fontSize:11,color:'var(--text-muted)',marginTop:2}}>{msg.time}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div style={{marginTop:24,padding:16,background:'rgba(255,255,255,0.03)',borderRadius:12}}>
-          <h4 style={{fontSize:13,fontWeight:600,color:'#94a3b8',marginBottom:10}}>ORDER ITEMS</h4>
+        <div style={{marginTop:24,padding:16,background:'var(--bg-glass)',borderRadius:12}}>
+          <h4 style={{fontSize:13,fontWeight:600,color:'var(--text-secondary)',marginBottom:10}}>ORDER ITEMS</h4>
           {order.items?.map((item, i) => (
-            <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
-              <span style={{fontSize:14,color:'#cbd5e1'}}>{item.name} × {item.quantity}</span>
-              <span style={{fontSize:14,color:'#f1f5f9',fontWeight:600}}>Rs. {item.price * item.quantity}</span>
+            <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid var(--border-glass)'}}>
+              <span style={{fontSize:14,color:'var(--text-secondary)'}}>{item.name} × {item.quantity}</span>
+              <span style={{fontSize:14,color:'var(--text-primary)',fontWeight:600}}>Rs. {item.price * item.quantity}</span>
             </div>
           ))}
         </div>

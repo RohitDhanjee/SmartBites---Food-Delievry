@@ -9,6 +9,15 @@ dotenv.config();
 const app = express();
 app.use(cors());
 
+// ---- Health Check ----
+app.get('/health', (req, res) => {
+  res.json({
+    service: 'Chat Service',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -17,15 +26,63 @@ const io = new Server(server, {
   }
 });
 
-// Auto-reply phrases for the Rider
-const riderReplies = [
-  "Ji sir, main bas 2 minute mein pohanch raha hoon.",
-  "Rasta thora block hai, par main jaldi koshish kar raha hoon.",
-  "Okay sir, main aapki location ke paas hoon.",
-  "Ji, maine restaurant se khana pick kar liya hai.",
-  "Zaroor sir, main dhyan rakhunga.",
-  "Bohot shukriya! Bas pohanch gaya."
-];
+// ---- AI Smart Reply Logic ----
+const getSmartReply = (message) => {
+  const text = message.toLowerCase();
+  
+  const rules = [
+    {
+      keywords: ['status', 'kahan', 'where', 'location', 'pohnch'],
+      replies: [
+        "Ji sir, main bas 2 minute mein pohanch raha hoon.",
+        "Main aapki location ke bohot kareeb hoon, bas signal par ruka hoon.",
+        "Ji, maine restaurant se khana pick kar liya hai aur raste mein hoon."
+      ]
+    },
+    {
+      keywords: ['late', 'delay', 'der', 'slow', 'time'],
+      replies: [
+        "Maazrat sir, raste mein thora traffic block hai, par main jaldi koshish kar raha hoon.",
+        "Barish/Traffic ki wajah se thori der ho rahi hai, bas 5-10 minute mazeed lagenge.",
+        "Rasta thora kharab hai, main shortcut le raha hoon."
+      ]
+    },
+    {
+      keywords: ['hot', 'garam', 'fresh', 'quality'],
+      replies: [
+        "Ji sir, khana bilkul garam aur packed hai. Main tezi se aa raha hoon.",
+        "Zaroor sir, maine check kar liya hai, khana bilkul fresh hai."
+      ]
+    },
+    {
+      keywords: ['thanks', 'shukriya', 'ok', 'okay', 'jazakallah'],
+      replies: [
+        "Bohot shukriya! Bas pohanch gaya.",
+        "You're welcome sir! Have a nice meal.",
+        "Ji sir, Allah hafiz."
+      ]
+    },
+    {
+      keywords: ['hello', 'hi', 'salam', 'hey', 'aoa'],
+      replies: [
+        "Walaikum Assalam/Hello sir! Main aapka rider baat kar raha hoon. Bas raste mein hoon.",
+        "Ji sir, main aapka order le kar nikal chuka hoon."
+      ]
+    }
+  ];
+
+  // Find matching rule
+  const matchedRule = rules.find(rule => 
+    rule.keywords.some(keyword => text.includes(keyword))
+  );
+
+  if (matchedRule) {
+    return matchedRule.replies[Math.floor(Math.random() * matchedRule.replies.length)];
+  }
+
+  // Fallback for unknown messages
+  return "Ji sir, main aapki baat samajh gaya. Main dhyan rakhunga.";
+};
 
 io.on('connection', (socket) => {
   console.log('User connected to chat:', socket.id);
@@ -45,16 +102,16 @@ io.on('connection', (socket) => {
       timestamp: new Date()
     });
 
-    // Auto-reply logic if sender is customer
+    // Smart Auto-reply logic if sender is customer
     if (sender === 'customer') {
       setTimeout(() => {
-        const randomReply = riderReplies[Math.floor(Math.random() * riderReplies.length)];
+        const smartReply = getSmartReply(text);
         io.to(`order_${orderId}`).emit('receive_message', {
-          text: randomReply,
+          text: smartReply,
           sender: 'rider',
           timestamp: new Date()
         });
-      }, 3000); // 3 second delay for realistic feel
+      }, 2500); 
     }
   });
 

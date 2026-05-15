@@ -88,12 +88,12 @@ const styles = {
   name: {
     fontSize: '18px',
     fontWeight: 700,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     marginBottom: '4px',
   },
   cuisine: {
     fontSize: '13px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     marginBottom: '12px',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
@@ -109,7 +109,7 @@ const styles = {
     alignItems: 'center',
     gap: '4px',
     fontSize: '13px',
-    color: '#cbd5e1',
+    color: 'var(--text-secondary)',
     fontWeight: 500,
   },
   address: {
@@ -117,7 +117,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     fontSize: '12px',
-    color: '#64748b',
+    color: 'var(--text-muted)',
   },
 };
 

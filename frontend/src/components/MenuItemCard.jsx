@@ -73,11 +73,11 @@ const styles = {
   name: {
     fontSize: '15px',
     fontWeight: 600,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
   },
   description: {
     fontSize: '12px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     marginBottom: '12px',
     lineHeight: 1.4,
     flex: 1,

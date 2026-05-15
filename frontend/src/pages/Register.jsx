@@ -115,13 +115,13 @@ const styles = {
   title: {
     fontSize: '28px',
     fontWeight: 800,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     marginTop: '12px',
     marginBottom: '8px',
   },
   subtitle: {
     fontSize: '14px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
   },
   form: {
     display: 'flex',
@@ -136,7 +136,7 @@ const styles = {
     textAlign: 'center',
     marginTop: '24px',
     fontSize: '14px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
   },
   link: {
     color: '#ff6b35',

@@ -45,7 +45,47 @@ app.use('/api/', limiter);        // Apply rate limit to all /api routes
 // If we parse the body here, it gets consumed and the proxy
 // sends an empty body to the microservice.
 
-// ---- Health Check Endpoint ----
+// ---- Cluster Health Check (Distributed Systems Monitor) ----
+app.get('/api/system/health', async (req, res) => {
+  const http = require('http');
+  const services = [
+    { name: 'User Service', url: process.env.USER_SERVICE_URL },
+    { name: 'Restaurant Service', url: process.env.RESTAURANT_SERVICE_URL },
+    { name: 'Order Service', url: process.env.ORDER_SERVICE_URL },
+    { name: 'Payment Service', url: process.env.PAYMENT_SERVICE_URL },
+    { name: 'Delivery Service', url: process.env.DELIVERY_SERVICE_URL },
+    { name: 'Review Service', url: process.env.REVIEW_SERVICE_URL || 'http://review-service:4007' },
+    { name: 'Analytics Service', url: process.env.ANALYTICS_SERVICE_URL || 'http://analytics-service:4006' },
+    { name: 'Chat Service', url: process.env.CHAT_SERVICE_URL || 'http://chat-service:4008' }
+  ];
+
+  const ping = (url) => new Promise((resolve) => {
+    try {
+      const u = new URL(url);
+      const req = http.get({
+        hostname: u.hostname,
+        port: u.port,
+        path: '/health',
+        timeout: 1500
+      }, (r) => resolve(r.statusCode === 200 ? 'Online' : 'Degraded'));
+      req.on('error', () => resolve('Offline'));
+      req.on('timeout', () => { req.destroy(); resolve('Timeout'); });
+    } catch (e) { resolve('Config Error'); }
+  });
+
+  const results = await Promise.all(services.map(async s => ({
+    name: s.name,
+    status: await ping(s.url)
+  })));
+
+  res.json({
+    success: true,
+    cluster: results,
+    gateway: 'Online',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Used by Docker and monitoring tools to verify the gateway is running
 app.get('/health', (req, res) => {
   res.json({

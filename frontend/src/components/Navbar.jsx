@@ -6,10 +6,12 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShoppingCart, User, LogOut, UtensilsCrossed, Package, BarChart2 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { ShoppingCart, User, LogOut, UtensilsCrossed, Package, BarChart2, Sun, Moon } from 'lucide-react';
 
 const Navbar = () => {
   const { isAuthenticated, user, logout, cartCount } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -32,6 +34,10 @@ const Navbar = () => {
             <UtensilsCrossed size={16} />
             Restaurants
           </Link>
+
+          <button onClick={toggleTheme} style={styles.themeToggle} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
           {isAuthenticated ? (
             <>
@@ -91,11 +97,26 @@ const styles = {
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    background: 'rgba(10, 10, 15, 0.85)',
+    background: 'var(--bg-primary)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    borderBottom: '1px solid var(--border-glass)',
     padding: '0 0',
+    opacity: 0.95,
+  },
+  themeToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '36px',
+    height: '36px',
+    borderRadius: '10px',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-glass)',
+    color: 'var(--text-primary)',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    marginRight: '4px',
   },
   container: {
     display: 'flex',
@@ -115,7 +136,7 @@ const styles = {
   logoText: {
     fontSize: '22px',
     fontWeight: 800,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     letterSpacing: '-0.5px',
   },
   logoAccent: {
@@ -133,7 +154,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     padding: '8px 14px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     fontSize: '14px',
     fontWeight: 500,
     textDecoration: 'none',
@@ -148,9 +169,10 @@ const styles = {
     width: '40px',
     height: '40px',
     borderRadius: '10px',
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
     textDecoration: 'none',
-    background: 'rgba(255,255,255,0.06)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-glass)',
     transition: 'all 0.2s',
   },
   cartBadge: {
@@ -173,16 +195,17 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     padding: '6px 12px',
-    background: 'rgba(255,255,255,0.06)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-glass)',
     borderRadius: '10px',
-    color: '#94a3b8',
+    color: 'var(--text-secondary)',
     marginLeft: '4px',
     textDecoration: 'none',
   },
   userName: {
     fontSize: '14px',
     fontWeight: 500,
-    color: '#f1f5f9',
+    color: 'var(--text-primary)',
   },
   logoutBtn: {
     display: 'flex',

@@ -8,6 +8,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext(null);
 
@@ -96,18 +97,22 @@ export const AuthProvider = ({ children }) => {
     setCartRestaurant(restaurant);
     localStorage.setItem('smartbite_cart_restaurant', JSON.stringify(restaurant));
     
-    setCart(prev => {
-      const existing = prev.find(i => i._id === item._id);
-      if (existing) {
-        return prev.map(i => 
-          i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
+    const existing = cart.find(i => i._id === item._id);
+    if (existing) {
+      toast.success(`Added another ${item.name}!`, { icon: '➕' });
+      setCart(prev => prev.map(i => 
+        i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
+      ));
+    } else {
+      toast.success(`${item.name} added to cart`, { icon: '🛒' });
+      setCart(prev => [...prev, { ...item, quantity: 1 }]);
+    }
   };
 
   const removeFromCart = (itemId) => {
+    const item = cart.find(i => i._id === itemId);
+    if (item) toast.error(`${item.name} removed`, { icon: '🗑️' });
+    
     setCart(prev => {
       const updated = prev.filter(i => i._id !== itemId);
       if (updated.length === 0) {
@@ -133,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     setCartRestaurant(null);
     localStorage.removeItem('smartbite_cart');
     localStorage.removeItem('smartbite_cart_restaurant');
+    toast.success('Cart cleared', { icon: '🧹' });
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
