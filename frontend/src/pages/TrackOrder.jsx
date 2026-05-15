@@ -6,7 +6,7 @@ import OrderTracker from '../components/OrderTracker';
 import OrderChat from '../components/OrderChat';
 import { ArrowLeft, Wifi, WifiOff } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4005';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${window.location.hostname}:4005`;
 
 const TrackOrder = () => {
   const { orderId } = useParams();

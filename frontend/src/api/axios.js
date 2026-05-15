@@ -8,7 +8,10 @@
 
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// Dynamic API URL detection: Uses env var if set, otherwise falls back to current hostname
+const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:4000`;
+// Dynamic Socket URL detection
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${window.location.hostname}:4005`;
 
 const api = axios.create({
   baseURL: API_URL,

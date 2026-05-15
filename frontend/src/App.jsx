@@ -24,7 +24,7 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4005';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${window.location.hostname}:4005`;
 
 function App() {
   useEffect(() => {

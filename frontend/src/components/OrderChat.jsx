@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { MessageSquare, Send, X, User, ShieldCheck } from 'lucide-react';
 
-const CHAT_SERVER = import.meta.env.VITE_SOCKET_URL ? import.meta.env.VITE_SOCKET_URL.replace(':4005', ':4008') : 'http://localhost:4008';
+const CHAT_SERVER = import.meta.env.VITE_SOCKET_URL 
+  ? import.meta.env.VITE_SOCKET_URL.replace(':4005', ':4008') 
+  : `http://${window.location.hostname}:4008`;
 
 const OrderChat = ({ orderId }) => {
   const [isOpen, setIsOpen] = useState(false);
