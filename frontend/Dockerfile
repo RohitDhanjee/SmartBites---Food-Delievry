@@ -2,8 +2,8 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Accept build-time arguments for API URLs
-ARG VITE_API_URL=http://localhost:4000
-ARG VITE_SOCKET_URL=http://localhost:4005
+ARG VITE_API_URL
+ARG VITE_SOCKET_URL
 
 # Set as environment variables (available at runtime for dev server)
 ENV VITE_API_URL=$VITE_API_URL
