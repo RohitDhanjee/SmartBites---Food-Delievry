@@ -9,3 +9,4 @@ scratch
 smartbite.pem
 *.log
 locust_results*
+*.pdf
