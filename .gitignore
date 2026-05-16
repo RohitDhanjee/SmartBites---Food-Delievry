@@ -1,9 +1,11 @@
 node_modules
 .env
-.git
 .idea
 dist
-.
 docs
 docx
 scratch
+*.pem
+smartbite.pem
+*.log
+locust_results*
