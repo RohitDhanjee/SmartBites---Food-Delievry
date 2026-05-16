@@ -4,9 +4,9 @@ node_modules
 dist
 docs
 docx
-scratch
+scratch/
 *.pem
 smartbite.pem
 *.log
 locust_results*
-*.pdf
+"CS-432 DC CEP Problem Description and Instructions.pdf"
