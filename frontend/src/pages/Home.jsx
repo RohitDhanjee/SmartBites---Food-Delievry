@@ -38,10 +38,10 @@ const Home = () => {
   const filtered = restaurants.filter(r => {
     const q = search.toLowerCase();
     if (!q) return true;
-    
+
     const name = r.name.toLowerCase();
     const cuisine = r.cuisine.toLowerCase();
-    
+
     // Exact or partial match
     if (name.includes(q) || cuisine.includes(q)) return true;
 
@@ -63,16 +63,16 @@ const Home = () => {
     <div className="page">
       <div className="container">
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           style={styles.hero}
         >
-          <div style={styles.heroTag}>
+          {/* <div style={styles.heroTag}>
             <Flame size={14} color="#ff6b35" />
             <span>AI-Powered Food Delivery</span>
-          </div>
+          </div> */}
           <h1 style={styles.heroTitle}>
             Discover <span style={styles.heroAccent}>Delicious</span> Food
             <br />Near You
@@ -99,12 +99,12 @@ const Home = () => {
         {!loading && recommended.length > 0 && !search && (
           <div style={{ marginBottom: '48px' }}>
             <div style={styles.sectionHeader}>
-              <h2 style={styles.sectionTitle}>✨ Recommended by AI</h2>
+              <h2 style={styles.sectionTitle}>✨ Recommended For You</h2>
               <span style={{ fontSize: '12px', color: '#ff8c42', fontWeight: 600 }}>BASED ON YOUR PREFERENCES</span>
             </div>
             <div className="grid-restaurants">
               {recommended.map((restaurant, index) => (
-                <motion.div 
+                <motion.div
                   key={`rec-${restaurant._id}`}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -123,7 +123,7 @@ const Home = () => {
         )}
 
         {/* Stats Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -160,7 +160,7 @@ const Home = () => {
         ) : filtered.length > 0 ? (
           <div className="grid-restaurants">
             {filtered.map((restaurant, index) => (
-              <motion.div 
+              <motion.div
                 key={restaurant._id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
